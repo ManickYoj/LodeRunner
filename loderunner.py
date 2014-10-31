@@ -70,9 +70,13 @@ class Character (object):
         ty = self._y + dy
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
             if self._level[index(tx,ty)] in PASSABLE:
-                self._x = tx
-                self._y = ty
-                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+                if dx != 0:
+                    self._x = tx
+                    self._img.move(dx*CELL_SIZE, 0)
+
+                if dy != 0 and self._level[index(self._x, self._y)] in CLIMBABLE:
+                    self._y = ty
+                    self._img.move(0, dy*CELL_SIZE)
 
 
 class Player (Character):
