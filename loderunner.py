@@ -36,7 +36,7 @@ IMAGE_MAP = {
 IMPASSABLE = [CELL_TYPE['BRICK']]
 PASSABLE = [elem for elem in CELL_TYPE.values() if elem not in IMPASSABLE]
 STANDABLE = [CELL_TYPE['LADDER'], CELL_TYPE['BRICK']]
-GRABBABLE = [CELL_TYPE['ROPE']]
+GRABBABLE = [CELL_TYPE['ROPE'], CELL_TYPE['LADDER']]
 CLIMBABLE = [CELL_TYPE['LADDER']]
 TAKEABLE = [CELL_TYPE['GOLD']]
 
@@ -67,29 +67,34 @@ class Character (object):
     def pos(self):
         return self._x, self._y
 
-    def same_loc (self,x,y):
+    def same_loc(self, x, y):
         return (self._x == x and self._y == y)
 
-    def move (self,dx,dy):
+    def move(self, dx, dy):
+        """ Applies a move, if valid. """
         tx = self._x + dx
         ty = self._y + dy
+
+        # Only allow movement inside the map
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            if self._level[index(tx,ty)] in PASSABLE:
-                if dx != 0:
-                    self._x = tx
-                    self._img.move(dx*CELL_SIZE, 0)
 
-                if dy != 0 and self._level[index(self._x, self._y)] in CLIMBABLE:
-                    self._y = ty
-                    self._img.move(0, dy*CELL_SIZE)
+            # Only allow movement into passable tiles
+            if self._level[index(tx, ty)] in PASSABLE:
 
+                # Do not allow player to climb if they are not in a climbable tile
+                if dy < 0 and self._level[index(self._x, self._y)] not in CLIMBABLE:
+                    return
+
+                self._x = tx
+                self._y = ty
+                self._img.move(dx*CELL_SIZE, dy*CELL_SIZE)
                 self.fall()
 
     def fall(self):
-        cur_item = self._level[index(self._x, self._y)]
-        next_item = self._level[index(self._x, self._y+1)]
+        cur_tile = self._level[index(self._x, self._y)]
+        next_tile = self._level[index(self._x, self._y+1)]
 
-        if not next_item in STANDABLE or cur_item in GRABBABLE:
+        if not next_tile in STANDABLE and not cur_tile in GRABBABLE:
             self._y += 1
             self._img.move(0, CELL_SIZE)
             self.fall()
