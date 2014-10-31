@@ -35,6 +35,8 @@ IMAGE_MAP = {
 
 IMPASSABLE = [CELL_TYPE['BRICK']]
 PASSABLE = [elem for elem in CELL_TYPE.values() if elem not in IMPASSABLE]
+STANDABLE = [CELL_TYPE['LADDER'], CELL_TYPE['BRICK']]
+GRABBABLE = [CELL_TYPE['ROPE']]
 CLIMBABLE = [CELL_TYPE['LADDER']]
 TAKEABLE = [CELL_TYPE['GOLD']]
 
@@ -62,6 +64,9 @@ class Character (object):
         self._y = y
         self._level = level
 
+    def pos(self):
+        return self._x, self._y
+
     def same_loc (self,x,y):
         return (self._x == x and self._y == y)
 
@@ -77,6 +82,17 @@ class Character (object):
                 if dy != 0 and self._level[index(self._x, self._y)] in CLIMBABLE:
                     self._y = ty
                     self._img.move(0, dy*CELL_SIZE)
+
+                self.fall()
+
+    def fall(self):
+        cur_item = self._level[index(self._x, self._y)]
+        next_item = self._level[index(self._x, self._y+1)]
+
+        if not next_item in STANDABLE or cur_item in GRABBABLE:
+            self._y += 1
+            self._img.move(0, CELL_SIZE)
+            self.fall()
 
 
 class Player (Character):
@@ -125,10 +141,7 @@ def create_level(num):
 
 
 def create_screen(level, window):
-    # use this instead of Rectangle below for nicer screen
-    brick = 'brick.gif'
     def image(pos, img):
-        # TODO: Clean up border
         return Image(Point((pos[0]+1)*CELL_SIZE-1, (pos[1]+1)*CELL_SIZE-1), img)
 
     for index, value in enumerate(level):
