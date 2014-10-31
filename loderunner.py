@@ -59,6 +59,9 @@ class Player (Character):
     def at_exit (self):
         return (self._y == 0)
 
+    def dig(self):
+    	pass
+
 
 class Baddie (Character):
     def __init__ (self,x,y,window,level,player):
@@ -85,7 +88,9 @@ def won (window):
 
 def create_level(num):
     with open('level{}.csv'.format(num), 'rb') as file_data:
-        return [[int(elem) for elem in row] for row in csv.reader(file_data)]
+      	level = [[int(elem) for elem in row] for row in csv.reader(file_data)]
+        print(level)
+        return level
 
 
 def create_screen(level, window):
