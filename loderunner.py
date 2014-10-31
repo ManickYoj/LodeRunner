@@ -17,6 +17,26 @@ CELL_SIZE = 24
 WINDOW_WIDTH = CELL_SIZE*LEVEL_WIDTH
 WINDOW_HEIGHT = CELL_SIZE*LEVEL_HEIGHT
 
+CELL_TYPE = {
+  'EMPTY':  0,
+  'BRICK':  1,
+  'LADDER': 2,
+  'ROPE':   3,
+  'GOLD':   4,
+  'BADDIE': 5
+}
+
+IMAGE_MAP = {
+	1: 'brick.gif',
+  	2: 'ladder.gif',
+  	3: 'rope.gif',
+  	4: 'gold.gif'
+}
+
+IMPASSABLE = [CELL_TYPE['BRICK']]
+PASSABLE = [elem for elem in CELL_TYPE.values() if elem not in IMPASSABLE]
+CLIMBABLE = [CELL_TYPE['LADDER']]
+TAKEABLE = [CELL_TYPE['GOLD']]
 
 def screen_pos (x,y):
     return (x*CELL_SIZE+10,y*CELL_SIZE+10)
@@ -28,6 +48,9 @@ def screen_pos_index (index):
 
 def index (x,y):
     return x + (y*LEVEL_WIDTH)
+
+def coord(index):
+    return index % LEVEL_WIDTH, index // LEVEL_WIDTH
 
 class Character (object):
     def __init__ (self,pic,x,y,window,level):
@@ -46,11 +69,11 @@ class Character (object):
         tx = self._x + dx
         ty = self._y + dy
         if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            if self._level[index(tx,ty)] == 0:
+            if self._level[index(tx,ty)] in PASSABLE:
                 self._x = tx
                 self._y = ty
                 self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
-                
+
 
 class Player (Character):
     def __init__ (self,x,y,window,level):
@@ -59,7 +82,7 @@ class Player (Character):
     def at_exit (self):
         return (self._y == 0)
 
-    def dig(self):
+    def take(self):
     	pass
 
 
@@ -88,8 +111,9 @@ def won (window):
 
 def create_level(num):
     with open('level{}.csv'.format(num), 'rb') as file_data:
-      	level = [[int(elem) for elem in row] for row in csv.reader(file_data)]
-        print(level)
+        level = []
+        for row in csv.reader(file_data):
+            level.extend([int(elem) for elem in row])
         return level
 
 
@@ -100,11 +124,10 @@ def create_screen(level, window):
         # TODO: Clean up border
         return Image(Point((pos[0]+1)*CELL_SIZE-1, (pos[1]+1)*CELL_SIZE-1), img)
 
-    for row in range(len(level)):
-        for col, cell in enumerate(level[row]):
-            if cell == 1:
-                pos = (col, row)
-                image(pos, brick).draw(window)
+    for index, value in enumerate(level):
+        if value in IMAGE_MAP:
+            pos = coord(index)
+            image(pos, IMAGE_MAP[value]).draw(window)
 
 
 MOVE = {
@@ -117,7 +140,7 @@ MOVE = {
 
 def main ():
 
-    window = GraphWin("Maze", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)
+    window = GraphWin("LodeRunner", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)
     rect = Rectangle(Point(5,5),Point(WINDOW_WIDTH+15,WINDOW_HEIGHT+15))
     rect.setFill('sienna')
     rect.setOutline('sienna')
@@ -128,7 +151,6 @@ def main ():
     rect.draw(window)
 
     level = create_level(1)
-
     screen = create_screen(level, window)
 
     p = Player(10,18,window,level)
