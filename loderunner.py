@@ -83,8 +83,11 @@ class Player (Character):
         return (self._y == 0)
 
     def take(self):
-    	pass
-
+    	#print('Calling take.')
+    	if self._level[index(self._x,self._y)] in TAKEABLE:
+    		print('Taking.')
+    		self._level[index(self._x,self._y)] = 0
+    		
 
 class Baddie (Character):
     def __init__ (self,x,y,window,level,player):
@@ -167,8 +170,12 @@ def main ():
         if key in MOVE:
             (dx,dy) = MOVE[key]
             p.move(dx,dy)
+        p.take()
 
         # baddies should probably move here
+
+
+
 
     won(window)
 
