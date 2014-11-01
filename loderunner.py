@@ -64,7 +64,6 @@ class Item (object):
 		self._img.draw(Item._window)
 
 	def remove(self):
-		print('Undrawing.')
 		self._img.undraw()
 	
 class Character (object):
@@ -103,6 +102,7 @@ class Character (object):
                 self._y = ty
                 self._img.move(dx*CELL_SIZE, dy*CELL_SIZE)
                 self.fall()
+        print(self._x, self._y)
 
     def fall(self):
         cur_tile = self._level[index(self._x, self._y)]
@@ -111,7 +111,8 @@ class Character (object):
         if not next_tile in STANDABLE and not cur_tile in GRABBABLE:
             self._y += 1
             self._img.move(0, CELL_SIZE)
-            self.fall()
+            if self._y + 1 < LEVEL_HEIGHT:
+            	self.fall()
 
 
 class Player (Character):
@@ -122,18 +123,25 @@ class Player (Character):
 	def at_exit (self):
 		return (self._y == 0)
 
-	def take(self):  
-		print("Taken!")     
+	def take(self):
 		# remove from the level
 		self._level[index(self._x,self._y)] = 0
 		
-		# destroy the image -- ?
-		print(self._item_map[index(self._x, self._y)])
+		# destroy the image
 		self._item_map[index(self._x, self._y)].remove()
 
 		# remove the item from the item map
-		self._item_map.remove(self._item_map[index(self._x, self._y)])
+		self._item_map[index(self._x, self._y)] = None
 
+	def dig(self, direction):
+		x = self._x + direction
+		y = self._y + 1
+
+		if self._y < LEVEL_HEIGHT - 1:
+			if self._level[index(x, y)] == 1 and self._level[index(x, y-1)] == 0:
+				self._level[index(x, y)] = 0
+				self._item_map[index(x, y)].remove()
+				self._item_map[index(x, y)] = None
 
 class Baddie (Character):
 	def __init__ (self,x,y,window,level,player):
@@ -173,7 +181,6 @@ def create_item_map(level):
 			item_map.append(item)
 		else:
 			item_map.append(None)
-
 	return item_map
 
 def create_screen(level, window):
@@ -228,6 +235,10 @@ def main ():
 
 		if level[index(p._x,p._y)] in TAKEABLE:
 			p.take()
+		if key == 'a':
+			p.dig(-1)
+		if key == 'z':
+			p.dig(1)
 
 		# baddies should probably move here
 
