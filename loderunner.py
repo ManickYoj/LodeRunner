@@ -28,9 +28,9 @@ CELL_TYPE = {
 
 IMAGE_MAP = {
 	1: 'brick.gif',
-  	2: 'ladder.gif',
-  	3: 'rope.gif',
-  	4: 'gold.gif'
+	2: 'ladder.gif',
+	3: 'rope.gif',
+	4: 'gold.gif'
 }
 
 IMPASSABLE = [CELL_TYPE['BRICK']]
@@ -39,145 +39,177 @@ CLIMBABLE = [CELL_TYPE['LADDER']]
 TAKEABLE = [CELL_TYPE['GOLD']]
 
 def screen_pos (x,y):
-    return (x*CELL_SIZE+10,y*CELL_SIZE+10)
+	return (x*CELL_SIZE+10,y*CELL_SIZE+10)
 
 def screen_pos_index (index):
-    x = index % LEVEL_WIDTH
-    y = (index - x) / LEVEL_WIDTH
-    return screen_pos(x,y)
+	x = index % LEVEL_WIDTH
+	y = (index - x) / LEVEL_WIDTH
+	return screen_pos(x,y)
 
 def index (x,y):
-    return x + (y*LEVEL_WIDTH)
+	return x + (y*LEVEL_WIDTH)
 
 def coord(index):
-    return index % LEVEL_WIDTH, index // LEVEL_WIDTH
+	return index % LEVEL_WIDTH, index // LEVEL_WIDTH
 
+class Item (object):
+	_window = None
+
+	def __init__(self, pos, img):
+		self._x = pos[0]
+		self._y = pos[1]
+		self._img = Image(Point((self._x+1)*CELL_SIZE-1, (self._y+1)*CELL_SIZE-1), img)
+		self._img.draw(Item._window)
+
+	def remove(self):
+		print('Undrawing.')
+		self._img.undraw()
+	
 class Character (object):
-    def __init__ (self,pic,x,y,window,level):
-        (sx,sy) = screen_pos(x,y)
-        self._img = Image(Point(sx+CELL_SIZE/2,sy+CELL_SIZE/2+2),pic)
-        self._window = window
-        self._img.draw(window)
-        self._x = x
-        self._y = y
-        self._level = level
+	def __init__ (self,pic,x,y,window,level):
+		(sx,sy) = screen_pos(x,y)
+		self._img = Image(Point(sx+CELL_SIZE/2,sy+CELL_SIZE/2+2),pic)
+		self._window = window
+		self._img.draw(window)
+		self._x = x
+		self._y = y
+		self._level = level
 
-    def same_loc (self,x,y):
-        return (self._x == x and self._y == y)
+	def same_loc (self,x,y):
+		return (self._x == x and self._y == y)
 
-    def move (self,dx,dy):
-        tx = self._x + dx
-        ty = self._y + dy
-        if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
-            if self._level[index(tx,ty)] in PASSABLE:
-                self._x = tx
-                self._y = ty
-                self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
+	def move (self,dx,dy):
+		tx = self._x + dx
+		ty = self._y + dy
+		if tx >= 0 and ty >= 0 and tx < LEVEL_WIDTH and ty < LEVEL_HEIGHT:
+			if self._level[index(tx,ty)] in PASSABLE:
+				self._x = tx
+				self._y = ty
+				self._img.move(dx*CELL_SIZE,dy*CELL_SIZE)
 
 
 class Player (Character):
-    def __init__ (self,x,y,window,level):
-        Character.__init__(self,'android.gif',x,y,window,level)
+	def __init__ (self,x,y,window,level, item_map):
+		Character.__init__(self,'android.gif',x,y,window,level)
+		self._item_map = item_map
 
-    def at_exit (self):
-        return (self._y == 0)
+	def at_exit (self):
+		return (self._y == 0)
 
-    def take(self):
-    	#print('Calling take.')
-    	if self._level[index(self._x,self._y)] in TAKEABLE:
-    		print('Taking.')
-    		self._level[index(self._x,self._y)] = 0
-    		
+	def take(self):  
+		print("Taken!")     
+		# remove from the level
+		self._level[index(self._x,self._y)] = 0
+		
+		# destroy the image -- ?
+		print(self._item_map[index(self._x, self._y)])
+		self._item_map[index(self._x, self._y)].remove()
+
+		# remove the item from the item map
+		self._item_map.remove(self._item_map[index(self._x, self._y)])
+
 
 class Baddie (Character):
-    def __init__ (self,x,y,window,level,player):
-        Character.__init__(self,'red.gif',x,y,window,level)
-        self._player = player
-
+	def __init__ (self,x,y,window,level,player):
+		Character.__init__(self,'red.gif',x,y,window,level)
+		self._player = player
 
 def lost (window):
-    t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
-    t.setSize(36)
-    t.setTextColor('red')
-    t.draw(window)
-    window.getKey()
-    exit(0)
+	t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
+	t.setSize(36)
+	t.setTextColor('red')
+	t.draw(window)
+	window.getKey()
+	exit(0)
 
 def won (window):
-    t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU WON!')
-    t.setSize(36)
-    t.setTextColor('red')
-    t.draw(window)
-    window.getKey()
-    exit(0)
+	t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU WON!')
+	t.setSize(36)
+	t.setTextColor('red')
+	t.draw(window)
+	window.getKey()
+	exit(0)
 
 
 def create_level(num):
-    with open('level{}.csv'.format(num), 'rb') as file_data:
-        level = []
-        for row in csv.reader(file_data):
-            level.extend([int(elem) for elem in row])
-        return level
+	with open('level{}.csv'.format(num), 'rb') as file_data:
+		level = []
+		for row in csv.reader(file_data):
+			level.extend([int(elem) for elem in row])
+		return level
 
+def create_item_map(level):
+	item_map = []
+	for index, value in enumerate(level):
+		if value in IMAGE_MAP:
+			pos = coord(index)
+			item = Item(pos, IMAGE_MAP[value])
+			item_map.append(item)
+		else:
+			item_map.append(None)
+
+	return item_map
 
 def create_screen(level, window):
-    # use this instead of Rectangle below for nicer screen
-    brick = 'brick.gif'
-    def image(pos, img):
-        # TODO: Clean up border
-        return Image(Point((pos[0]+1)*CELL_SIZE-1, (pos[1]+1)*CELL_SIZE-1), img)
+	# use this instead of Rectangle below for nicer screen
+	brick = 'brick.gif'
+	def image(pos, img):
+		# TODO: Clean up border
+		return Image(Point((pos[0]+1)*CELL_SIZE-1, (pos[1]+1)*CELL_SIZE-1), img)
 
-    for index, value in enumerate(level):
-        if value in IMAGE_MAP:
-            pos = coord(index)
-            image(pos, IMAGE_MAP[value]).draw(window)
+	for index, value in enumerate(level):
+		if value in IMAGE_MAP:
+			pos = coord(index)
+			#image(pos, IMAGE_MAP[value]).draw(window)
 
 
 MOVE = {
-    'Left': (-1,0),
-    'Right': (1,0),
-    'Up' : (0,-1),
-    'Down' : (0,1)
+	'Left': (-1,0),
+	'Right': (1,0),
+	'Up' : (0,-1),
+	'Down' : (0,1)
 }
 
 
 def main ():
 
-    window = GraphWin("LodeRunner", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)
-    rect = Rectangle(Point(5,5),Point(WINDOW_WIDTH+15,WINDOW_HEIGHT+15))
-    rect.setFill('sienna')
-    rect.setOutline('sienna')
-    rect.draw(window)
-    rect = Rectangle(Point(10,10),Point(WINDOW_WIDTH+10,WINDOW_HEIGHT+10))
-    rect.setFill('white')
-    rect.setOutline('white')
-    rect.draw(window)
+	window = GraphWin("LodeRunner", WINDOW_WIDTH+20, WINDOW_HEIGHT+20)
+	Item._window = window
 
-    level = create_level(1)
-    screen = create_screen(level, window)
+	rect = Rectangle(Point(5,5),Point(WINDOW_WIDTH+15,WINDOW_HEIGHT+15))
+	rect.setFill('sienna')
+	rect.setOutline('sienna')
+	rect.draw(window)
+	rect = Rectangle(Point(10,10),Point(WINDOW_WIDTH+10,WINDOW_HEIGHT+10))
+	rect.setFill('white')
+	rect.setOutline('white')
+	rect.draw(window)
 
-    p = Player(10,18,window,level)
+	level = create_level(1)
+	item_map = create_item_map(level) #
+	screen = create_screen(level, window)
 
-    baddie1 = Baddie(5,1,window,level,p)
-    baddie2 = Baddie(10,1,window,level,p)
-    baddie3 = Baddie(15,1,window,level,p)
+	p = Player(10,18,window,level, item_map)
 
-    while not p.at_exit():
-        key = window.checkKey()
-        if key == 'q':
-            window.close()
-            exit(0)
-        if key in MOVE:
-            (dx,dy) = MOVE[key]
-            p.move(dx,dy)
-        p.take()
+	baddie1 = Baddie(5,1,window,level,p)
+	baddie2 = Baddie(10,1,window,level,p)
+	baddie3 = Baddie(15,1,window,level,p)
 
-        # baddies should probably move here
+	while not p.at_exit():
+		key = window.checkKey()
+		if key == 'q':
+			window.close()
+			exit(0)
+		if key in MOVE:
+			(dx,dy) = MOVE[key]
+			p.move(dx,dy)
 
+		if level[index(p._x,p._y)] in TAKEABLE:
+			p.take()
 
+		# baddies should probably move here
 
-
-    won(window)
+	won(window)
 
 if __name__ == '__main__':
-    main()
+	main()
