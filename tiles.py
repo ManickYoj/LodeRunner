@@ -1,5 +1,4 @@
-import csv, config, util
-from graphics import GraphWin
+import csv, util
 from drawable import Drawable
 
 
@@ -15,7 +14,7 @@ class Tile(Drawable):
     }
 
     @staticmethod
-    def loadLevel(num):
+    def load_level(num):
         with open('level{}.csv'.format(num), 'rb') as file_data:
             Tile.level = []
             for row in csv.reader(file_data):
@@ -23,6 +22,20 @@ class Tile(Drawable):
 
         for index, tile in enumerate(Tile.level):
             tile.draw(util.coord(index))
+
+    @staticmethod
+    def query(coord, property):
+        tile = Tile.level[util.index(*coord)]
+        return tile.properties[property]
+
+    @staticmethod
+    def tile_at(coord):
+        return Tile.level[util.index(*coord)]
+
+    @staticmethod
+    def clear(coord):
+        Tile.level[util.index(*coord)].undraw()
+        Tile.level[util.index(*coord)] = Empty()
 
     def __init__(self, img_path=None, properties={}):
         super(Tile, self).__init__(img_path)
@@ -32,11 +45,15 @@ class Tile(Drawable):
                            'takable':   False,
                            'standable': False,
                            'climbable': False,
-                           'grabbable': False}
+                           'grabbable': False,
+                           'diggable':  False}
 
         for key in properties:
             if key in self.properties:
                 self.properties[key] = properties[key]
+
+    def take(self, coords):
+        pass
 
 
 class Empty(Tile):
@@ -47,7 +64,8 @@ class Empty(Tile):
 class Brick(Tile):
     def __init__(self):
         properties = {'passable':   False,
-                      'standable':  True}
+                      'standable':  True,
+                      'diggable':   True}
         super(Brick, self).__init__('brick.gif', properties)
 
 
@@ -66,17 +84,20 @@ class Rope(Tile):
 
 
 class Gold(Tile):
-    _numGold = 0
+    _num_gold = 0
+
+    @staticmethod
+    def all_taken():
+        return Gold._num_gold <= 0
 
     def __init__(self):
-        Gold._numGold += 1
+        Gold._num_gold += 1
         properties = {'takable': True}
         super(Gold, self).__init__('gold.gif', properties)
 
     def take(self, coords):
-        self.undraw()
-        Gold._numGold -= 1
-        Tile.tile_map(util.index(coords))
+        Gold._num_gold -= 1
+        Tile.clear(coords)
 
 
 Tile.tile_map = {0: Empty,
@@ -87,5 +108,4 @@ Tile.tile_map = {0: Empty,
 
 
 if __name__ == "__main__":
-    Drawable._window = GraphWin("LodeRunner", config.WINDOW_WIDTH+20, config.WINDOW_HEIGHT+20)
-    Tile.loadLevel(1)
+    Tile.load_level(1)
