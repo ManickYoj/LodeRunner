@@ -1,4 +1,4 @@
-import csv, util
+import csv, util, os
 from drawable import Drawable
 
 
@@ -15,7 +15,7 @@ class Tile(Drawable):
 
     @staticmethod
     def load_level(num):
-        with open('level{}.csv'.format(num), 'rb') as file_data:
+        with open(os.path.join('levels','level{}.csv').format(num), 'rb') as file_data:
             Tile.level = []
             for row in csv.reader(file_data):
                 Tile.level.extend([Tile.tile_map[int(elem)]() for elem in row])

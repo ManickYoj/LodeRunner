@@ -1,4 +1,4 @@
-import config
+import config, os
 from graphics import Image, Point, GraphWin
 
 
@@ -11,7 +11,7 @@ class Drawable(object):
 
     def draw(self, coords):
         if self._img_path:
-            self._img = Image(Point((coords[0]+1)*config.CELL_SIZE-1, (coords[1]+1)*config.CELL_SIZE-1), self._img_path)
+            self._img = Image(Point((coords[0]+1)*config.CELL_SIZE-1, (coords[1]+1)*config.CELL_SIZE-1), os.path.join('graphics', self._img_path))
             self._img.draw(Drawable._window)
 
     def move_img(self, dx, dy):
