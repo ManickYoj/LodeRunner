@@ -81,3 +81,14 @@ class Player (Character):
 class Baddie (Character):
     def __init__(self, x, y):
         super(Baddie, self).__init__('t_red.gif', x, y)
+        self.move_event = Event(self.move, 120, recurring=True)
+
+    def move(self):
+        # if player is above the baddie
+        if Player.main.pos[1] > self._y:
+            # find nearest ladder that leads to player's y position
+            #row = [Tile.level[(20 / (self._y+1)) : (20 / (self._y+2))]]
+
+            pass
+        else:
+            pass
