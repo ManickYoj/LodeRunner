@@ -70,7 +70,7 @@ class Tile(Drawable):
                            'diggable':  False}
         self.undraw()
 
-    def reveal(self):
+    def show(self):
         self.draw()
         self.properties = self.hidden_properties
 
@@ -125,9 +125,9 @@ class Gold(Tile):
 class HiddenLadder(Ladder):
     _hidden = []
     @staticmethod
-    def revealAll():
+    def showAll():
         for ladder in HiddenLadder._hidden:
-            ladder.reveal()
+            ladder.show()
         HiddenLadder._hidden = []
 
     def __init__(self, coord):
