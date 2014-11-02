@@ -70,9 +70,8 @@ class Player (Character):
 
         if self._y < config.LEVEL_HEIGHT - 1:
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
-                #Tile.clear((x, y))
-                hole_refill = Event(Tile.tile_at((x, y)).refill, 6e5)
-                Tile.clear((x,y))
+                Tile.tile_at((x,y)).hide()
+                refill = Event(Tile.tile_at((x, y)).reveal, 6e5)
 
     def redraw(self):
         self.undraw()
