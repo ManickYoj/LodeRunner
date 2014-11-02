@@ -5,11 +5,11 @@ By: Bonnie Ishiguro and Nick Francisci
 for Game Programming: Level 4
 """
 
+import config, time
 from graphics import *
 from drawable import Drawable
 from tiles import Tile, Gold, HiddenLadder
 from characters import Player
-import config
 from event import Event
 
 
@@ -52,8 +52,11 @@ def main():
     # baddie1 = Baddie(5,1,window,level,p)
     # baddie2 = Baddie(10,1,window,level,p)
     # baddie3 = Baddie(15,1,window,level,p)
+    frame_time = 1/30
 
     while not Player.main.at_exit():
+        frame_start_time = time.time()
+
         key = Drawable._window.checkKey()
 
         if key in KEYMAP:
@@ -69,8 +72,11 @@ def main():
 
         # baddies should probably move here
 
+        frame_end_time = time.time()
+        if frame_end_time - frame_start_time < frame_time:
+            time.sleep(frame_end_time - frame_start_time)
+
     won(Drawable._window)
 
 if __name__ == '__main__':
     main()
- 
