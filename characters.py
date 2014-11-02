@@ -54,7 +54,7 @@ class Player (Character):
     main = None
 
     def __init__(self, x, y):
-        super(Player, self).__init__('android.gif', x, y)
+        super(Player, self).__init__('t_android.gif', x, y)
         Player.main = self
 
     def at_exit(self):
@@ -80,4 +80,4 @@ class Player (Character):
 
 class Baddie (Character):
     def __init__(self, x, y):
-        super(Baddie, self).__init__('red.gif', x, y)
+        super(Baddie, self).__init__('t_red.gif', x, y)
