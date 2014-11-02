@@ -13,9 +13,11 @@ class Tile(Drawable):
         # 4: Gold
     }
 
+    _hidden_tiles = []
+
     @staticmethod
     def load_level(num):
-        with open(os.path.join('levels','level{}.csv').format(num), 'rb') as file_data:
+        with open(os.path.join('levels', 'level{}.csv').format(num), 'rb') as file_data:
             Tile.level = []
             for row in csv.reader(file_data):
                 Tile.level.extend([Tile.tile_map[int(elem)]() for elem in row])
@@ -33,13 +35,17 @@ class Tile(Drawable):
         return Tile.level[util.index(*coord)]
 
     @staticmethod
+    def reveal():
+        for tile in Tile._hidden_tiles:
+            tile._reveal()
+        Tile._hidden_tiles = []
+
+    @staticmethod
     def clear(coord):
         Tile.level[util.index(*coord)].undraw()
         Tile.level[util.index(*coord)] = Empty()
 
-    def __init__(self, img_path=None, properties={}):
-        super(Tile, self).__init__(img_path)
-
+    def __init__(self, img_path=None, properties={}, hidden=False):
         # Set up tile properties
         self.properties = {'passable':  True,
                            'takable':   False,
@@ -51,6 +57,25 @@ class Tile(Drawable):
         for key in properties:
             if key in self.properties:
                 self.properties[key] = properties[key]
+
+        self.hidden = hidden
+        if self.hidden:
+            self.hidden_properties = self.properties
+            self.properties = {'passable':  True,
+                               'takable':   False,
+                               'standable': False,
+                               'climbable': False,
+                               'grabbable': False,
+                               'diggable':  False}
+            Tile._hidden_tiles.append(self)
+
+        super(Tile, self).__init__(img_path, hidden)
+
+    def _reveal(self):
+        if self.hidden:
+            self.hidden = False
+            self.show()
+            self.properties = self.hidden_properties
 
     def take(self, coords):
         pass
@@ -70,11 +95,11 @@ class Brick(Tile):
 
 
 class Ladder(Tile):
-    def __init__(self):
+    def __init__(self, hidden=False):
         properties = {'standable':  True,
                       'climbable':  True,
                       'grabbable':  True}
-        super(Ladder, self).__init__('ladder.gif', properties)
+        super(Ladder, self).__init__('ladder.gif', properties, hidden)
 
 
 class Rope(Tile):
@@ -100,11 +125,17 @@ class Gold(Tile):
         Tile.clear(coords)
 
 
+class HiddenLadder(Ladder):
+    def __init__(self):
+        super(HiddenLadder, self).__init__(hidden=True)
+
+
 Tile.tile_map = {0: Empty,
                  1: Brick,
                  2: Ladder,
                  3: Rope,
-                 4: Gold}
+                 4: Gold,
+                 5: HiddenLadder}
 
 
 if __name__ == "__main__":

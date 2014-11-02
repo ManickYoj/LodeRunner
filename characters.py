@@ -71,6 +71,10 @@ class Player (Character):
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
                 Tile.clear((x, y))
 
+    def redraw(self):
+        self.undraw()
+        self.draw(self.pos())
+
 
 class Baddie (Character):
     def __init__(self, x, y):
