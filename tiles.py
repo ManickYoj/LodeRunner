@@ -21,7 +21,7 @@ class Tile(Drawable):
             Tile.level = []
             row_num = 0
             for row in csv.reader(file_data):
-                Tile.level.extend([Tile.tile_map[int(elem)]((index, row_num)) for index, elem in enumerate(row)])
+                Tile.level.extend([Tile.tile_map[elem]((index, row_num)) if elem in Tile.tile_map else Empty((index, row_num)) for index, elem in enumerate(row) ])
                 row_num += 1
 
     @staticmethod
@@ -134,12 +134,12 @@ class HiddenLadder(Ladder):
         HiddenLadder._hidden.append(self)
 
 
-Tile.tile_map = {0: Empty,
-                 1: Brick,
-                 2: Ladder,
-                 3: Rope,
-                 4: Gold,
-                 5: HiddenLadder}
+Tile.tile_map = {'0': Empty,
+                 '1': Brick,
+                 '2': Ladder,
+                 '3': Rope,
+                 '4': Gold,
+                 '5': HiddenLadder}
 
 
 if __name__ == "__main__":

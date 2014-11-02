@@ -1,10 +1,22 @@
 from drawable import Drawable
-from tiles import Tile, Empty, Brick
+from tiles import Tile, Empty
 from event import Event
-import config
+import config, csv, os
 
 
 class Character (Drawable):
+    char_map = {}
+
+    @staticmethod
+    def load_characters(num):
+        with open(os.path.join('levels', 'level{}.csv').format(num), 'rb') as file_data:
+            row_num = 0
+            for row in csv.reader(file_data):
+                for col, value in enumerate(row):
+                    if value in char_map:
+                        char_map[value](col, row_num)
+                row_num += 1
+
 
     def __init__(self, img_path, x, y):
         super(Character, self).__init__((x, y), img_path)
@@ -92,3 +104,6 @@ class Baddie (Character):
             pass
         else:
             pass
+
+char_map = {'P': Player,
+            'B': Baddie}
