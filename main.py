@@ -9,7 +9,7 @@ import config, time
 from graphics import *
 from drawable import Drawable
 from tiles import Tile, Gold, HiddenLadder
-from characters import Player
+from characters import Player, Character
 from event import Event
 
 
@@ -32,6 +32,10 @@ def won(window):
     exit(0)
 
 
+def load_level(num):
+    Tile.load_level(num)
+    Character.load_characters(num)
+
 KEYMAP = {
     'Left':     'Player.main.move(-1, 0)',
     'Right':    'Player.main.move(1, 0)',
@@ -44,14 +48,9 @@ KEYMAP = {
 
 
 def main():
-    Tile.load_level(2)
+    load_level(2)
     hidden_flag = False
 
-    # TODO: Make this occur as part of load level
-    Player(10, 18)
-    # baddie1 = Baddie(5,1,window,level,p)
-    # baddie2 = Baddie(10,1,window,level,p)
-    # baddie3 = Baddie(15,1,window,level,p)
     frame_duration = 1.0/60.0
 
     while not Player.main.at_exit():
