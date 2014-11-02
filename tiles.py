@@ -90,6 +90,9 @@ class Brick(Tile):
                       'diggable':   True}
         super(Brick, self).__init__(coord, 'brick.gif', properties)
 
+    def refill(self):
+        print('Refilling!')
+
 
 class Ladder(Tile):
     def __init__(self, coord, hidden=False):
