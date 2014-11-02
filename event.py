@@ -24,10 +24,11 @@ class Event:
 	def __init__(self, func, frames, args=[], recurring=None):
 		self.func = func
 		self.args = args
+		self.frames = frames
 		if recurring:
 			recurring = self
 		self.recurring = recurring
-		Event._enqueue(self.frames, self)
+		Event._enqueue(self)#self.frames, self)
 
 	def execute(self):
 		self.func(*self.args)

@@ -100,7 +100,7 @@ class Brick(Tile):
         super(Brick, self).__init__(coord, 'brick.gif', properties)
 
     def refill(self):
-        pass
+        print('Refilling!')
 
 
 class Ladder(Tile):
