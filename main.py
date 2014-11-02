@@ -5,6 +5,7 @@ from drawable import Drawable
 from tiles import Tile
 from characters import Player
 import config
+from event import Event
 
 
 # TODO: Move these somewhere more appropriate (drawable?)
@@ -37,7 +38,7 @@ KEYMAP = {
 
 
 def main():
-    Tile.load_level(1)
+    Tile.load_level(2)
 
     # TODO: Make this occur as part of load level
     Player(10, 18)
@@ -51,9 +52,12 @@ def main():
         if key in KEYMAP:
             eval(KEYMAP[key])
 
+        Event.update()
+
         # baddies should probably move here
 
     won(Drawable._window)
 
 if __name__ == '__main__':
     main()
+ 
