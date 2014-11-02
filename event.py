@@ -1,0 +1,34 @@
+class Event:
+
+	_queue = {}
+	_frame = 0
+
+	@staticmethod
+	def _enqueue(obj):
+		target_frame = Event._frame + obj.frames
+		if target_frame in Event._queue:
+			Event._queue[target_frame].append(obj)
+		else:
+			Event._queue[target_frame] = [obj]
+
+	@staticmethod
+	def update():
+		if Event._frame in Event._queue:
+			for event in Event._queue[Event._frame]:
+				new_event = event.execute()
+				if new_event:
+					Event._enqueue(new_event)
+			del Event._queue[Event._frame]
+		Event._frame += 1
+
+	def __init__(self, func, frames, recurring=None):
+		self.func = func
+		self.frames = frames
+		if recurring:
+			recurring = self
+		self.recurring = recurring
+		Event._enqueue(self.frames, self)
+
+	def execute(self):
+		self.func()
+		return self.recurring
