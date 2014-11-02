@@ -63,7 +63,7 @@ def main():
 
         if not hidden_flag:
             if Gold.all_taken():
-                Tile.reveal()
+                Tile.revealAll()
                 Player.main.redraw()
                 hidden_flag = True
 

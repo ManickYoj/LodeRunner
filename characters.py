@@ -61,7 +61,7 @@ class Player (Character):
 
     def apply_move(self, dx, dy):
         super(Player, self).apply_move(dx, dy)
-        Tile.tile_at(self.pos()).take(self.pos())
+        Tile.tile_at(self.pos()).take()
 
     def dig(self, direction):
         x = self._x + direction
