@@ -124,9 +124,9 @@ class Gold(Tile):
 class HiddenLadder(Ladder):
     _hidden = []
     @staticmethod
-    def revealAll():
+    def showAll():
         for ladder in HiddenLadder._hidden:
-            ladder.reveal()
+            ladder.show()
         HiddenLadder._hidden = []
 
     def __init__(self, coord):
