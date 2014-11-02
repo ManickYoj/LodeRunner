@@ -21,11 +21,8 @@ class Tile(Drawable):
             Tile.level = []
             row_num = 0
             for row in csv.reader(file_data):
-                Tile.level.extend([Tile.tile_map[int(elem)]((index, row_num)) for index, elem in enumerate(row)])
+                Tile.level.extend([Tile.tile_map[int(elem)]((index, row_num)) for index, elem in enumerate(row) if int(elem) in Tile.tile_map])
                 row_num += 1
-
-        # for index, tile in enumerate(Tile.level):
-        #     tile.draw(util.coord(index))
 
     @staticmethod
     def query(coord, property):
