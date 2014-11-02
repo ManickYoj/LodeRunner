@@ -22,3 +22,5 @@ class Drawable(object):
     def undraw(self):
         if self._img:
             self._img.undraw()
+
+Drawable._window.setBackground('white')
