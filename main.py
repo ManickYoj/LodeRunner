@@ -7,7 +7,7 @@ for Game Programming: Level 4
 
 from graphics import *
 from drawable import Drawable
-from tiles import Tile, Gold
+from tiles import Tile, Gold, HiddenLadder
 from characters import Player
 import config
 from event import Event
@@ -63,7 +63,7 @@ def main():
 
         if not hidden_flag:
             if Gold.all_taken():
-                Tile.revealAll()
+                HiddenLadder.revealAll()
                 Player.main.redraw()
                 hidden_flag = True
 

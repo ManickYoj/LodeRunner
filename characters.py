@@ -6,8 +6,8 @@ import config
 class Character (Drawable):
 
     def __init__(self, img_path, x, y):
-        super(Character, self).__init__(img_path)
-        self.draw((x, y))
+        super(Character, self).__init__((x, y), img_path)
+        self.draw()
 
         self._x = x
         self._y = y
@@ -73,7 +73,7 @@ class Player (Character):
 
     def redraw(self):
         self.undraw()
-        self.draw(self.pos())
+        self.draw()
 
 
 class Baddie (Character):
