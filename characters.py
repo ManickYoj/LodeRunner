@@ -70,3 +70,8 @@ class Player (Character):
         if self._y < config.LEVEL_HEIGHT - 1:
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
                 Tile.clear((x, y))
+
+
+class Baddie (Character):
+    def __init__(self, x, y):
+        super(Baddie, self).__init__('red.gif', x, y)

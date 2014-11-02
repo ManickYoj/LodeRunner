@@ -6,11 +6,8 @@ from tiles import Tile
 from characters import Player
 import config
 
-# class Baddie (Character):
-#     def __init__ (self,x,y,window,level,player):
-#         Character.__init__(self,'red.gif',x,y,window,level)
-#         self._player = player
 
+# TODO: Move these somewhere more appropriate (drawable?)
 def lost (window):
     t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
     t.setSize(36)
@@ -44,7 +41,6 @@ def main():
 
     # TODO: Make this occur as part of load level
     Player(10, 18)
-
     # baddie1 = Baddie(5,1,window,level,p)
     # baddie2 = Baddie(10,1,window,level,p)
     # baddie3 = Baddie(15,1,window,level,p)
@@ -56,7 +52,6 @@ def main():
             eval(KEYMAP[key])
 
         # baddies should probably move here
-
 
     won(Drawable._window)
 
