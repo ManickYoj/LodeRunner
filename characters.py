@@ -1,13 +1,14 @@
 from drawable import Drawable
-from tiles import Tile, Empty
+from tiles import Tile, Empty, Brick
+from event import Event
 import config
 
 
 class Character (Drawable):
 
     def __init__(self, img_path, x, y):
-        super(Character, self).__init__(img_path)
-        self.draw((x, y))
+        super(Character, self).__init__((x, y), img_path)
+        self.draw()
 
         self._x = x
         self._y = y
@@ -53,7 +54,7 @@ class Player (Character):
     main = None
 
     def __init__(self, x, y):
-        super(Player, self).__init__('android.gif', x, y)
+        super(Player, self).__init__('t_android.gif', x, y)
         Player.main = self
 
     def at_exit(self):
@@ -69,13 +70,14 @@ class Player (Character):
 
         if self._y < config.LEVEL_HEIGHT - 1:
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
-                Tile.clear((x, y))
+                Tile.tile_at((x,y)).hide()
+                refill = Event(Tile.tile_at((x, y)).show, 120)
 
     def redraw(self):
         self.undraw()
-        self.draw(self.pos())
+        self.draw()
 
 
 class Baddie (Character):
     def __init__(self, x, y):
-        super(Baddie, self).__init__('red.gif', x, y)
+        super(Baddie, self).__init__('t_red.gif', x, y)

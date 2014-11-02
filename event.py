@@ -21,14 +21,15 @@ class Event:
 			del Event._queue[Event._frame]
 		Event._frame += 1
 
-	def __init__(self, func, frames, recurring=None):
+	def __init__(self, func, frames, args=[], recurring=None):
 		self.func = func
+		self.args = args
 		self.frames = frames
 		if recurring:
 			recurring = self
 		self.recurring = recurring
-		Event._enqueue(self.frames, self)
+		Event._enqueue(self)#self.frames, self)
 
 	def execute(self):
-		self.func()
+		self.func(*self.args)
 		return self.recurring

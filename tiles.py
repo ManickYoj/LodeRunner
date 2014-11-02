@@ -34,17 +34,15 @@ class Tile(Drawable):
         return Tile.level[util.index(*coord)]
 
     @staticmethod
-    def revealAll():
-        for tile in Tile._hidden_tiles:
-            tile.reveal()
-        Tile._hidden_tiles = []
-
-    @staticmethod
     def clear(coord):
         Tile.level[util.index(*coord)].undraw()
         Tile.level[util.index(*coord)] = Empty(coord)
 
     def __init__(self, coord, img_path=None, properties={}, hidden=False):
+        super(Tile, self).__init__(coord, img_path)
+        if not hidden:
+            self.draw()
+
         # Set up tile properties
         self.properties = {'passable':  True,
                            'takable':   False,
@@ -59,26 +57,22 @@ class Tile(Drawable):
 
         self.coord = coord
 
-        self.hidden = hidden
-        if self.hidden:
-            self.hidden_properties = self.properties
-            self.properties = {'passable':  True,
-                               'takable':   False,
-                               'standable': False,
-                               'climbable': False,
-                               'grabbable': False,
-                               'diggable':  False}
-            Tile._hidden_tiles.append(self)
+        if hidden:
+            self.hide()
 
-        super(Tile, self).__init__(img_path, hidden)
+    def hide(self):
+        self.hidden_properties = self.properties
+        self.properties = {'passable':  True,
+                           'takable':   False,
+                           'standable': False,
+                           'climbable': False,
+                           'grabbable': False,
+                           'diggable':  False}
+        self.undraw()
 
-        self.draw(coord)
-
-    def reveal(self):
-        if self.hidden:
-            self.hidden = False
-            self.show()
-            self.properties = self.hidden_properties
+    def show(self):
+        self.draw()
+        self.properties = self.hidden_properties
 
     def take(self):
         pass
@@ -95,7 +89,6 @@ class Brick(Tile):
                       'standable':  True,
                       'diggable':   True}
         super(Brick, self).__init__(coord, 'brick.gif', properties)
-
 
 class Ladder(Tile):
     def __init__(self, coord, hidden=False):
@@ -129,8 +122,16 @@ class Gold(Tile):
 
 
 class HiddenLadder(Ladder):
+    _hidden = []
+    @staticmethod
+    def showAll():
+        for ladder in HiddenLadder._hidden:
+            ladder.show()
+        HiddenLadder._hidden = []
+
     def __init__(self, coord):
         super(HiddenLadder, self).__init__(coord, hidden=True)
+        HiddenLadder._hidden.append(self)
 
 
 Tile.tile_map = {0: Empty,
