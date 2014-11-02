@@ -1,24 +1,30 @@
-
+"""
+LodeRunner Clone
+----------------
+By: Bonnie Ishiguro and Nick Francisci
+for Game Programming: Level 4
+"""
 
 from graphics import *
 from drawable import Drawable
-from tiles import Tile
+from tiles import Tile, Gold
 from characters import Player
 import config
 from event import Event
 
 
 # TODO: Move these somewhere more appropriate (drawable?)
-def lost (window):
-    t = Text(Point(WINDOW_WIDTH/2+10,WINDOW_HEIGHT/2+10),'YOU LOST!')
+def lost(window):
+    t = Text(Point(WINDOW_WIDTH/2+10, WINDOW_HEIGHT/2+10), 'YOU LOST!')
     t.setSize(36)
     t.setTextColor('red')
     t.draw(window)
     window.getKey()
     exit(0)
 
-def won (window):
-    t = Text(Point(config.WINDOW_WIDTH/2+10, config.WINDOW_HEIGHT/2+10),'YOU WON!')
+
+def won(window):
+    t = Text(Point(config.WINDOW_WIDTH/2+10, config.WINDOW_HEIGHT/2+10), 'YOU WON!')
     t.setSize(36)
     t.setTextColor('red')
     t.draw(window)
@@ -39,6 +45,7 @@ KEYMAP = {
 
 def main():
     Tile.load_level(2)
+    hidden_flag = False
 
     # TODO: Make this occur as part of load level
     Player(10, 18)
@@ -53,6 +60,12 @@ def main():
             eval(KEYMAP[key])
 
         Event.update()
+
+        if not hidden_flag:
+            if Gold.all_taken():
+                Tile.reveal()
+                Player.main.redraw()
+                hidden_flag = True
 
         # baddies should probably move here
 
