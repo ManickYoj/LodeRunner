@@ -52,7 +52,7 @@ def main():
     # baddie1 = Baddie(5,1,window,level,p)
     # baddie2 = Baddie(10,1,window,level,p)
     # baddie3 = Baddie(15,1,window,level,p)
-    frame_time = 1/30
+    frame_duration = 1.0/60.0
 
     while not Player.main.at_exit():
         frame_start_time = time.time()
@@ -72,10 +72,9 @@ def main():
 
         # baddies should probably move here
 
-        frame_end_time = time.time()
-        if frame_end_time - frame_start_time < frame_time:
-            time.sleep(frame_end_time - frame_start_time)
-
+        frame_time = time.time() - frame_start_time
+        if frame_time < frame_duration:
+            time.sleep(frame_duration - frame_time)
     won(Drawable._window)
 
 if __name__ == '__main__':
