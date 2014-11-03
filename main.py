@@ -5,7 +5,8 @@ By: Bonnie Ishiguro and Nick Francisci
 for Game Programming: Level 4
 """
 
-import config, time
+import time
+from config import Config
 from graphics import *
 from drawable import Drawable
 from tiles import Tile, Gold, HiddenLadder
@@ -15,7 +16,7 @@ from event import Event
 
 # TODO: Move these somewhere more appropriate (drawable?)
 def lost(window):
-    t = Text(Point(WINDOW_WIDTH/2+10, WINDOW_HEIGHT/2+10), 'YOU LOST!')
+    t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU LOST!')
     t.setSize(36)
     t.setTextColor('red')
     t.draw(window)
@@ -24,15 +25,16 @@ def lost(window):
 
 
 def won(window):
-    t = Text(Point(config.WINDOW_WIDTH/2+10, config.WINDOW_HEIGHT/2+10), 'YOU WON!')
+    t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU WON!')
     t.setSize(36)
     t.setTextColor('red')
     t.draw(window)
-    window.getKey()
-    exit(0)
+    time.sleep(2)
 
 
 def load_level(num):
+    Config.config_level(num)
+    Drawable.recreateWindow()
     Tile.load_level(num)
     Character.load_characters(num)
 
@@ -46,35 +48,37 @@ KEYMAP = {
     'q':        'exit(0)'
 }
 
+LEVELS = [1, 2]
+
 
 def main():
-    load_level(2)
-    hidden_flag = False
-
     frame_duration = 1.0/60.0
 
-    while not Player.main.at_exit():
-        frame_start_time = time.time()
+    for level in LEVELS:
+        load_level(level)
 
-        key = Drawable._window.checkKey()
+        while not Player.main.at_exit():
+            frame_start_time = time.time()
 
-        if key in KEYMAP:
-            eval(KEYMAP[key])
+            key = Drawable._window.checkKey()
 
-        Event.update()
+            if key in KEYMAP:
+                eval(KEYMAP[key])
 
-        if not hidden_flag:
-            if Gold.all_taken():
-                HiddenLadder.showAll()
-                Player.main.redraw()
-                hidden_flag = True
+            Event.update()
 
-        # baddies should probably move here
+            if not Config.hidden_flag:
+                if Gold.all_taken():
+                    HiddenLadder.showAll()
+                    Player.main.redraw()
+                    Config.hidqden_flag = True
 
-        frame_time = time.time() - frame_start_time
-        if frame_time < frame_duration:
-            time.sleep(frame_duration - frame_time)
-    won(Drawable._window)
+            # baddies should probably move here
+
+            frame_time = time.time() - frame_start_time
+            if frame_time < frame_duration:
+                time.sleep(frame_duration - frame_time)
+        won(Drawable._window)
 
 if __name__ == '__main__':
     main()
