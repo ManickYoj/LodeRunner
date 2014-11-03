@@ -134,16 +134,19 @@ char_map = {'P': Player,
             'B': Baddie}
 
 class PathFinder:
+    tiles = None
+
     @staticmethod
-    def valid_tile(pos):
+    def valid_tile(pos, last_pos):
         x, y = pos
         if x >= 0 and y >= 0 and x < Config.LEVEL_WIDTH and y < Config.LEVEL_HEIGHT:
             if Tile.query(pos, 'passable'):
                 under = (x, y+1)
 
                 if Tile.query(pos, 'grabbable') or Tile.query(under, 'standable'):
-                    return True
-        
+                    if not PathFinder.tiles[x][y]:
+                        PathFinder.tiles[x][y] = True
+                        return True
         return False
 
     @staticmethod
@@ -152,10 +155,11 @@ class PathFinder:
         Returns the optimal move from start_pos to get to the Player.
         Returns None if no valid paths exist.
         """
+        PathFinder.tiles = [[False for y in range(Config.LEVEL_HEIGHT)] for x in range(Config.LEVEL_WIDTH)]
 
         x, y = start_pos
         neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        valid_neighbors = [neighbor for neighbor in neighbors if PathFinder.valid_tile(neighbor)]
+        valid_neighbors = [neighbor for neighbor in neighbors if PathFinder.valid_tile(neighbor, start_pos)]
 
         children = []
         for valid_pos in valid_neighbors:
@@ -180,7 +184,7 @@ class PathFinder:
     def valid_neighbors(pos, last_pos):
         x, y = pos
         neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        return [neighbor for neighbor in neighbors if not neighbor == last_pos and PathFinder.valid_tile(neighbor)]
+        return [neighbor for neighbor in neighbors if not neighbor == last_pos and PathFinder.valid_tile(neighbor, pos)]
 
 
 
