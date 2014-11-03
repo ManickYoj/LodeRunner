@@ -1,7 +1,6 @@
 import csv, util, os
 from drawable import Drawable
 
-
 class Tile(Drawable):
     level = []
 
@@ -93,8 +92,7 @@ class Brick(Tile):
 class Ladder(Tile):
     def __init__(self, coord, hidden=False):
         properties = {'standable':  True,
-                      'climbable':  True,
-                      'grabbable':  True}
+                      'climbable':  True}
         super(Ladder, self).__init__(coord, 'ladder.gif', properties, hidden)
 
 

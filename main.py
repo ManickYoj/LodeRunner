@@ -10,27 +10,11 @@ from config import Config
 from graphics import *
 from drawable import Drawable
 from tiles import Tile, Gold, HiddenLadder
-from characters import Player, Character
+from characters import *
 from event import Event
 
 
 # TODO: Move these somewhere more appropriate (drawable?)
-def lost(window):
-    t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU LOST!')
-    t.setSize(36)
-    t.setTextColor('red')
-    t.draw(window)
-    window.getKey()
-    exit(0)
-
-
-def won(window):
-    t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU WON!')
-    t.setSize(36)
-    t.setTextColor('red')
-    t.draw(window)
-    time.sleep(2)
-
 
 def load_level(num):
     Config.config_level(num)
@@ -48,7 +32,7 @@ KEYMAP = {
     'q':        'exit(0)'
 }
 
-LEVELS = [1, 2]
+LEVELS = [2]
 
 
 def main():
@@ -71,14 +55,16 @@ def main():
                 if Gold.all_taken():
                     HiddenLadder.showAll()
                     Player.main.redraw()
-                    Config.hidqden_flag = True
+                    for baddie in Baddie.baddies:
+                        baddie.redraw()
+                    Config.hidden_flag = True
 
             # baddies should probably move here
 
             frame_time = time.time() - frame_start_time
             if frame_time < frame_duration:
                 time.sleep(frame_duration - frame_time)
-        won(Drawable._window)
+        Drawable.won()
 
 if __name__ == '__main__':
     main()

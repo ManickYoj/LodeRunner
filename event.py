@@ -21,6 +21,12 @@ class Event:
 			del Event._queue[Event._frame]
 		Event._frame += 1
 
+	@staticmethod
+	def delete(event):
+		for event_list in Event._queue.values():
+			if event in event_list:
+				event_list.remove(event)
+
 	def __init__(self, func, frames, args=[], recurring=None):
 		self.func = func
 		self.args = args
@@ -28,7 +34,7 @@ class Event:
 		if recurring:
 			recurring = self
 		self.recurring = recurring
-		Event._enqueue(self)#self.frames, self)
+		Event._enqueue(self)
 
 	def execute(self):
 		self.func(*self.args)

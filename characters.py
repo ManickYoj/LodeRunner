@@ -10,6 +10,7 @@ class Character (Drawable):
 
     @staticmethod
     def load_characters(num):
+        Baddie.baddies = []
         with open(os.path.join('levels', 'level{}.csv').format(num), 'rb') as file_data:
             row_num = 0
             for row in csv.reader(file_data):
@@ -59,8 +60,13 @@ class Character (Drawable):
     def fall(self):
         next_pos = (self._x, self._y+1)
 
-        if not Tile.query(next_pos, 'standable') and not Tile.query(self.pos(), 'grabbable'):
-            self.apply_move(0, 1)
+        if self._y < Config.LEVEL_HEIGHT:
+            if not Tile.query(next_pos, 'standable') and not Tile.query(self.pos(), 'grabbable'):
+                self.apply_move(0, 1)
+
+    def redraw(self):
+        self.undraw()
+        self.draw()
 
 
 class Player (Character):
@@ -76,33 +82,70 @@ class Player (Character):
     def apply_move(self, dx, dy):
         super(Player, self).apply_move(dx, dy)
         Tile.tile_at(self.pos()).take()
+        for baddie in Baddie.baddies:
+            if baddie.pos() == self.pos():
+                Drawable.lost()
 
     def dig(self, direction):
+        
+        def refill(tile):    
+            tile.show()
+            if Player.main.pos() == tile.coord:
+                Drawable.lost()
+            for baddie in Baddie.baddies:
+                if baddie.pos() == tile.coord:
+                    baddie.die()
+
         x = self._x + direction
         y = self._y + 1
 
         if self._y < Config.LEVEL_HEIGHT - 1:
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
                 Tile.tile_at((x,y)).hide()
-                refill = Event(Tile.tile_at((x, y)).show, 120)
 
-    def redraw(self):
-        self.undraw()
-        self.draw()
+                Event(refill, 120, args=[Tile.tile_at((x, y))])
+                for baddie in Baddie.baddies:
+                    baddie.fall()
+
+
 
 
 class Baddie (Character):
+    baddies = []
+
     def __init__(self, x, y):
         super(Baddie, self).__init__(x, y, 't_red.gif')
-        self.move_event = Event(self.move, 120, recurring=True)
+        self.move_event = Event(self.move, 30, recurring=True)
+        Baddie.baddies.append(self)
 
     def move(self):
-        pass
+        move = PathFinder.run(self.pos())
+        if move:
+            super(Baddie, self).move(*move)
+        if self.pos() == Player.main.pos():
+            Drawable.lost()
+
+    def die(self):
+        self.undraw()
+        Event.delete(self.move_event)
+        Baddie.baddies.remove(self)
 
 char_map = {'P': Player,
             'B': Baddie}
 
 class PathFinder:
+    @staticmethod
+    def valid_tile(pos):
+        x, y = pos
+        if x >= 0 and y >= 0 and x < Config.LEVEL_WIDTH and y < Config.LEVEL_HEIGHT:
+            if Tile.query(pos, 'passable'):
+                under = (x, y+1)
+
+                if Tile.query(pos, 'grabbable'):
+                    return True
+        
+        return False
+
     @staticmethod
     def run(start_pos):
         """
@@ -112,43 +155,32 @@ class PathFinder:
 
         x, y = start_pos
         neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
-        valid_neighbors = [neighbor for neighbor in neighbors if valid_tile(neighbor)]
+        valid_neighbors = [neighbor for neighbor in neighbors if PathFinder.valid_tile(neighbor)]
 
         children = []
         for valid_pos in valid_neighbors:
             children.append(PathFinder(valid_pos, start_pos))
 
-        remove_list = []
-        while self.children:
+        
+        while children:
+            remove_list = []
             for child in children:
-                if child.update() == 1:
-                    return child.pos
-
-                elif child.update() == -1:
+                state = child.update()
+                if state == 1:
+                    return (child.pos[0] - start_pos[0], child.pos[1] - start_pos[1])
+                elif state == -1:
                     remove_list.append(child)
 
             for child in remove_list:
-                self._children.remove(child)
+                children.remove(child)
 
         return None
 
     @staticmethod
-    def valid_tile(pos):
-        if Tile.query(pos, 'passable'):
-            x, y = pos
-
-            if x >= 0 and y >= 0 and x < Config.LEVEL_WIDTH and y < Config.LEVEL_HEIGHT:
-                under = (x, y+1)
-
-                if Tile.query(pos, 'grabbable') or Tile.query(under, 'standable'):
-                    return True
-        
-        return False
-
-    @staticmethod
     def valid_neighbors(pos, last_pos):
-        neighbors = [(self._x - 1, self._y), (self._x + 1, self._y), (self._x, self._y - 1), (self._x, self._y + 1)]
-        return [neighbor for neighbor in neighbors if not neighbor == last_pos and valid_tile(neighbor)]
+        x, y = pos
+        neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+        return [neighbor for neighbor in neighbors if not neighbor == last_pos and PathFinder.valid_tile(neighbor)]
 
 
 
@@ -162,7 +194,7 @@ class PathFinder:
 
     def update(self):
         # Get all valid positions for children
-        children_pos = valid_neighbors(self.pos, self.last_pos)
+        children_pos = PathFinder.valid_neighbors(self.pos, self.last_pos)
 
 
 
@@ -188,10 +220,10 @@ class PathFinder:
 
         remove_list = []
         for child in self._children:
-            if child.update() == 1:
+            state = child.update()
+            if state == 1:
                 return 1
-
-            elif child.update() == -1:
+            elif state == -1:
                 remove_list.append(child)
 
         for child in remove_list:

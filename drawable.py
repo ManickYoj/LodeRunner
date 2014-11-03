@@ -1,6 +1,6 @@
-import os
+import os, time
 from config import Config
-from graphics import Image, Point, GraphWin
+from graphics import Image, Point, GraphWin, Text
 
 
 class Drawable(object):
@@ -12,6 +12,23 @@ class Drawable(object):
             Drawable._window.close()
         Drawable._window = GraphWin("LodeRunner", Config.WINDOW_WIDTH+20, Config.WINDOW_HEIGHT+20)
         Drawable._window.setBackground('white')
+
+    @staticmethod
+    def lost():
+        t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU LOST!')
+        t.setSize(36)
+        t.setTextColor('red')
+        t.draw(Drawable._window)
+        Drawable._window.getKey()
+        exit(0)
+
+    @staticmethod
+    def won():
+        t = Text(Point(Config.WINDOW_WIDTH/2+10, Config.WINDOW_HEIGHT/2+10), 'YOU WON!')
+        t.setSize(36)
+        t.setTextColor('red')
+        t.draw(Drawable._window)
+        time.sleep(2)
 
     def __init__(self, coords, img_path=None):
         if img_path:
