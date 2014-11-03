@@ -18,7 +18,7 @@ class Character (Drawable):
                 row_num += 1
 
 
-    def __init__(self, img_path, x, y):
+    def __init__(self, x, y, img_path=None):
         super(Character, self).__init__((x, y), img_path)
         self.draw()
 
@@ -66,7 +66,7 @@ class Player (Character):
     main = None
 
     def __init__(self, x, y):
-        super(Player, self).__init__('t_android.gif', x, y)
+        super(Player, self).__init__(x, y, 't_android.gif')
         Player.main = self
 
     def at_exit(self):
@@ -92,18 +92,111 @@ class Player (Character):
 
 class Baddie (Character):
     def __init__(self, x, y):
-        super(Baddie, self).__init__('t_red.gif', x, y)
+        super(Baddie, self).__init__(x, y, 't_red.gif')
         self.move_event = Event(self.move, 120, recurring=True)
 
     def move(self):
-        # if player is above the baddie
-        if Player.main.pos[1] > self._y:
-            # find nearest ladder that leads to player's y position
-            #row = [Tile.level[(20 / (self._y+1)) : (20 / (self._y+2))]]
-
-            pass
-        else:
-            pass
+        pass
 
 char_map = {'P': Player,
             'B': Baddie}
+
+class PathFinder:
+    @staticmethod
+    def run(start_pos):
+        """
+        Returns the optimal move from start_pos to get to the Player.
+        Returns None if no valid paths exist.
+        """
+
+        x, y = start_pos
+        neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+        valid_neighbors = [neighbor for neighbor in neighbors if valid_tile(neighbor)]
+
+        children = []
+        for valid_pos in valid_neighbors:
+            children.append(PathFinder(valid_pos, start_pos))
+
+        remove_list = []
+        while self.children:
+            for child in children:
+                if child.update() == 1:
+                    return child.pos
+
+                elif child.update() == -1:
+                    remove_list.append(child)
+
+            for child in remove_list:
+                self._children.remove(child)
+
+        return None
+
+    @staticmethod
+    def valid_tile(pos):
+        if Tile.query(pos, 'passable'):
+            x, y = pos
+
+            if x >= 0 and y >= 0 and x < Config.LEVEL_WIDTH and y < Config.LEVEL_HEIGHT:
+                under = (x, y+1)
+
+                if Tile.query(pos, 'grabbable') or Tile.query(under, 'standable'):
+                    return True
+        
+        return False
+
+    @staticmethod
+    def valid_neighbors(pos, last_pos):
+        neighbors = [(self._x - 1, self._y), (self._x + 1, self._y), (self._x, self._y - 1), (self._x, self._y + 1)]
+        return [neighbor for neighbor in neighbors if not neighbor == last_pos and valid_tile(neighbor)]
+
+
+
+    def __init__(self, pos, last_pos):
+        self._children = []
+        self._x = pos[0]
+        self._y = pos[1]
+        self.pos = pos
+        self.last_pos = last_pos
+
+
+    def update(self):
+        # Get all valid positions for children
+        children_pos = valid_neighbors(self.pos, self.last_pos)
+
+
+
+        # If children have not yet been created (ie this is a new node)
+        if not self._children:
+            # If we occupy the player's position, flag this node
+            if self.pos == Player.main.pos():
+                return 1
+
+            # If there are no valid moves from this child, delete this branch
+            if not children_pos:
+                return -1
+
+            # Create children at all valid locations
+            for child_pos in children_pos:
+                if child_pos == Player.main.pos():
+                    return 1
+                else:
+                    self._children.append(PathFinder(child_pos, self.pos))
+
+            return 0
+
+
+        remove_list = []
+        for child in self._children:
+            if child.update() == 1:
+                return 1
+
+            elif child.update() == -1:
+                remove_list.append(child)
+
+        for child in remove_list:
+            self._children.remove(child)
+
+        if not self._children:
+            return -1
+
+        return 0
