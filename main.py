@@ -32,7 +32,7 @@ KEYMAP = {
     'q':        'exit(0)'
 }
 
-LEVELS = [2]
+LEVELS = [1]
 
 
 def main():

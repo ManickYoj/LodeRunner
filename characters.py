@@ -141,7 +141,7 @@ class PathFinder:
             if Tile.query(pos, 'passable'):
                 under = (x, y+1)
 
-                if Tile.query(pos, 'grabbable'):
+                if Tile.query(pos, 'grabbable') or Tile.query(under, 'standable'):
                     return True
         
         return False
