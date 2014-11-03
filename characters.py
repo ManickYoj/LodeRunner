@@ -10,6 +10,8 @@ class Character (Drawable):
 
     @staticmethod
     def load_characters(num):
+        for baddie in Baddie.baddies:
+            baddie.die()
         Baddie.baddies = []
         with open(os.path.join('levels', 'level{}.csv').format(num), 'rb') as file_data:
             row_num = 0

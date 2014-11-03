@@ -22,4 +22,4 @@ class Config:
 
         Config.WINDOW_WIDTH = Config.CELL_SIZE*Config.LEVEL_WIDTH
         Config.WINDOW_HEIGHT = Config.CELL_SIZE*Config.LEVEL_HEIGHT
-        Config._hidden_flag = False
+        Config.hidden_flag = False

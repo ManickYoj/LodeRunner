@@ -92,7 +92,8 @@ class Brick(Tile):
 class Ladder(Tile):
     def __init__(self, coord, hidden=False):
         properties = {'standable':  True,
-                      'climbable':  True}
+                      'climbable':  True,
+                      'grabbable': True}
         super(Ladder, self).__init__(coord, 'ladder.gif', properties, hidden)
 
 
