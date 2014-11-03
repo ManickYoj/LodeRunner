@@ -1,7 +1,7 @@
-##LodeRunner
-# Bonnie Ishiguro and Nick Francisci
+#LodeRunner
+## Bonnie Ishiguro and Nick Francisci
 
-# Implementation Notes
+## Implementation Notes
 * The baddies navigate using a distant cousin of A*, they will not move if there is no valid path to your current location (and they cannot drop or dig, as you can)
 * There are multiple levels (well, 2...) but beware that due to a limitation of the graphics.py library, a new window is created after you beat the previous level. That window is not automatically focused, so you must click it when it appears to enter key commands (it won't register them otherwise)
 * Touching the top of the level is always the win condition, but there is only ever one valid path to get there, and you must collect all the gold to reveal it
