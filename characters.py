@@ -1,7 +1,8 @@
 from drawable import Drawable
 from tiles import Tile, Empty
 from event import Event
-import config, csv, os
+import csv, os
+from config import Config
 
 
 class Character (Drawable):
@@ -38,7 +39,7 @@ class Character (Drawable):
         next_pos = (tx, ty)
 
         # Only allow movement inside the map
-        if tx >= 0 and ty >= 0 and tx < config.LEVEL_WIDTH and ty < config.LEVEL_HEIGHT:
+        if tx >= 0 and ty >= 0 and tx < Config.LEVEL_WIDTH and ty < Config.LEVEL_HEIGHT:
 
             # Only allow movement into passable tiles
             if Tile.query(next_pos, 'passable'):
@@ -52,7 +53,7 @@ class Character (Drawable):
         self._x += dx
         self._y += dy
         self.move_img(dx, dy)
-        if self._y + 1 < config.LEVEL_HEIGHT:
+        if self._y + 1 < Config.LEVEL_HEIGHT:
             self.fall()
 
     def fall(self):
@@ -80,7 +81,7 @@ class Player (Character):
         x = self._x + direction
         y = self._y + 1
 
-        if self._y < config.LEVEL_HEIGHT - 1:
+        if self._y < Config.LEVEL_HEIGHT - 1:
             if Tile.query((x, y), 'diggable') and isinstance(Tile.tile_at((x, y-1)), Empty):
                 Tile.tile_at((x,y)).hide()
                 refill = Event(Tile.tile_at((x, y)).show, 120)

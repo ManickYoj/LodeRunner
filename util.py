@@ -1,19 +1,19 @@
-from config import *
+from config import Config
 
 
 def index(x, y):
-    return x + (y*LEVEL_WIDTH)
+    return x + (y*Config.LEVEL_WIDTH)
 
 
 def coord(index):
-    return index % LEVEL_WIDTH, index // LEVEL_WIDTH
+    return index % Config.LEVEL_WIDTH, index // Config.LEVEL_WIDTH
 
 
 def screen_pos(x, y):
-    return (x*CELL_SIZE+10, y*CELL_SIZE+10)
+    return (x*Config.CELL_SIZE+10, y*Config.CELL_SIZE+10)
 
 
 def screen_pos_index(index):
-    x = index % LEVEL_WIDTH
-    y = (index - x) / LEVEL_WIDTH
+    x = index % Config.LEVEL_WIDTH
+    y = (index - x) / Config.LEVEL_WIDTH
     return screen_pos(x, y)
