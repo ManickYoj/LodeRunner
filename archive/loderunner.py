@@ -166,7 +166,7 @@ def won (window):
 
 
 def create_level(num):
-	with open('level{}.csv'.format(num), 'rb') as file_data:
+	with open('level{}.csv'.format(num)) as file_data:
 		level = []
 		for row in csv.reader(file_data):
 			level.extend([int(elem) for elem in row])
