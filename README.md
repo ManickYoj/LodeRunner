@@ -1,6 +1,12 @@
 #LodeRunner
 ## Bonnie Ishiguro and Nick Francisci
 
+## Setup Notes
+Dependent upon Tkinter. To install tkinter on Linux:
+
+- For Python 2.X run`sudo apt-get install python-tk`
+- For Python 3.X run `sudo apt-get install python3-tk`
+
 ## Implementation Notes
 * The baddies navigate using a distant cousin of A*, they will not move if there is no valid path to your current location (and they cannot drop or dig, as you can)
 * There are multiple levels (well, 2...) but beware that due to a limitation of the graphics.py library, a new window is created after you beat the previous level. That window is not automatically focused, so you must click it when it appears to enter key commands (it won't register them otherwise)
