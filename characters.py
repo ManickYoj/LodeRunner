@@ -13,7 +13,7 @@ class Character (Drawable):
         for baddie in Baddie.baddies:
             baddie.die()
         Baddie.baddies = []
-        with open(os.path.join('levels', 'level{}.csv').format(num), 'rb') as file_data:
+        with open(os.path.join('levels', 'level{}.csv').format(num)) as file_data:
             row_num = 0
             for row in csv.reader(file_data):
                 for col, value in enumerate(row):
