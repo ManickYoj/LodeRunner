@@ -1,4 +1,4 @@
-#LodeRunner
+# LodeRunner
 ## Bonnie Ishiguro and Nick Francisci
 
 ## Setup Notes
